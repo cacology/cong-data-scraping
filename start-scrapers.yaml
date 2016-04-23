@@ -37,6 +37,8 @@
   tasks:
     - name: Lose Java
       yum: name=java state=absent
+    - name: Upgrade everything
+      yum: name=* state=latest
     - name: Add Git
       yum: name=git state=latest
     - name: Add gcc
