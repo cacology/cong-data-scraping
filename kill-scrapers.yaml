@@ -1,0 +1,26 @@
+- name: Terminate scrapers
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Provision zero servers
+      ec2:
+        key_name: grumpyVa
+        group_id: sg-0595837d
+        instance_type: t2.micro
+        image: ami-08111162
+        wait: true
+        wait_timeout: 600
+        count_tag:
+          class: scrapers
+        instance_tags:
+          class: scrapers
+        exact_count: 0
+        assign_public_ip: yes
+        region: us-east-1
+        vpc_subnet_id: subnet-3ce7a501
+      register: ec2
+#    - name: Terminate instances that were launched
+#      ec2:
+#        region: us-east-1
+#        state: 'absent'
+#        instance_ids: '{{ ec2.instance_ids }}'

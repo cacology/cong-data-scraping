@@ -1,0 +1,57 @@
+---
+- name: Launch instances of EC2
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Provision the servers
+      ec2:
+        key_name: grumpyVa
+        group_id: sg-0595837d
+        instance_type: t2.micro
+        image: ami-08111162
+        wait: true
+        wait_timeout: 600
+        count_tag:
+          class: scrapers
+        instance_tags:
+          class: scrapers
+        exact_count: 3
+        assign_public_ip: yes
+        region: us-east-1
+        vpc_subnet_id: subnet-3ce7a501
+        instance_profile_name: accessS3
+      register: ec2
+    - name: Add new instance to host group
+      add_host: hostname={{ item.public_ip }} groupname=launched
+      with_items: '{{ ec2.instances }}'
+    - name: Wait for SSH to come up
+      wait_for: host={{ item.public_dns_name }} port=22 delay=60 timeout=320 state=started
+      with_items: '{{ ec2.instances }}'
+
+- name: Configure scrapers
+  hosts: launched
+  gather_facts: True
+  remote_user: ec2-user
+  become: True
+  tasks:
+    - name: Lose Java
+      yum: name=java state=absent
+    - name: Add Git
+      yum: name=git state=latest
+    - name: Git congressional-record
+      git: repo=https://github.com/unitedstates/congressional-record.git
+           dest=/home/ec2-user/congressional-record
+    - name: Install congressional-record
+      command: "sudo python setup.py install"
+      args:
+        chdir: /home/ec2-user/congressional-record
+
+#- name: Terminate scrapers
+#  hosts: localhost
+#  connection: local
+#  tasks:
+#    - name: Terminate instances that were launched
+#      ec2:
+#        state: 'absent'
+#        instance_ids '{{ ec2.instance_ids }}'
