@@ -39,6 +39,12 @@
       yum: name=java state=absent
     - name: Add Git
       yum: name=git state=latest
+    - name: Add gcc
+      yum: name=gcc state=latest
+    - name: Add libxml2 development
+      yum: name=libxml2-devel state=latest
+    - name: Add libxslt development
+      yum: name=libxslt-devel state=latest
     - name: Git congressional-record
       git: repo=https://github.com/unitedstates/congressional-record.git
            dest=/home/ec2-user/congressional-record
@@ -46,12 +52,3 @@
       command: "sudo python setup.py install"
       args:
         chdir: /home/ec2-user/congressional-record
-
-#- name: Terminate scrapers
-#  hosts: localhost
-#  connection: local
-#  tasks:
-#    - name: Terminate instances that were launched
-#      ec2:
-#        state: 'absent'
-#        instance_ids '{{ ec2.instance_ids }}'
