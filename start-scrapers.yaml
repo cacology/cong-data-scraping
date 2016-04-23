@@ -52,3 +52,6 @@
       command: "sudo python setup.py install"
       args:
         chdir: /home/ec2-user/congressional-record
+    - name: Git scrape and dump script
+      git: repo=git@github.com:cacology/cong-data-scraping.git
+           dest=/home/ec2-user/bin
