@@ -16,7 +16,7 @@
           class: scrapers
         instance_tags:
           class: scrapers
-        exact_count: 4
+        exact_count: 8
         assign_public_ip: yes
         region: us-east-1
         vpc_subnet_id: subnet-3ce7a501
